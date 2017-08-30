@@ -1,0 +1,8 @@
+# gitignore file for mandel
+
+glut32.lib
+glut32.dll
+debug.txt
+mdata.txt
+hist.csv
+bin/
