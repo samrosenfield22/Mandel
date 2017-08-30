@@ -1,0 +1,12 @@
+REV 3
+------
+
+Goal: speed everything up
+(add compression to reduce file access operations)
+
+what i actually did: add the compression, allow mouse zooming
+faster, but needs work
+ideas for speedup:
+* add "paging" (write each data point to an array, then dump the whole array to the mdata file/ read a chunk into an array)
+* use the SSEx instruction set to compute a few points at once
+* use a heuristic (ex. if the last few points have the same value, we can predict the next few points)
