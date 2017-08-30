@@ -5,4 +5,4 @@ glut32.dll
 debug.txt
 mdata.txt
 hist.csv
-bin/
+main.exe
