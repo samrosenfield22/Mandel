@@ -3,6 +3,6 @@
 glut32.lib
 glut32.dll
 debug.txt
-dat\mdata.txt
+"dat\mdata.txt"
 hist.csv
 main.exe
