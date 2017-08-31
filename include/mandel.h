@@ -10,7 +10,6 @@
 #include <math.h>
 
 
-
 #define INCR 1000		//number of points (on the x-axis, 2/3rds of this value on the y-axis)
 
 #define XMAX_INITIAL 1.0
