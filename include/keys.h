@@ -4,9 +4,12 @@
 #define KEYS_H_
 
 #include <math.h>
+//#include <stdlib.h>
 
 #include "render.h"
+#include "history.h"
 
+#define minBoxSize 0.003f
 
 void processNormalKeys(unsigned char, int, int);
 void processSpecialKeys(int, int, int);

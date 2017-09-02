@@ -5,6 +5,9 @@
 
 void processNormalKeys(unsigned char key, int x, int y)
 {
+	static char enteredIters[7];
+	static uint8_t ip=0;
+	static bool MANUAL_ITER_MODE = false;
 
 	switch(key)
 	{
@@ -12,7 +15,7 @@ void processNormalKeys(unsigned char key, int x, int y)
 			exit(0);
 			break;
 
-		case 'r':
+		case 'h':
 			xmax=XMAX_INITIAL;
 			xmin=XMIN_INITIAL;
 			ymax=YMAX_INITIAL;
@@ -20,8 +23,44 @@ void processNormalKeys(unsigned char key, int x, int y)
 			ITERATIONS = ITERATIONS_INITIAL;
 			zoom = 1.0;
 			nextzoom = 1.0;
+			addNewFrame(xmax, xmin, ymax, ymin, ITERATIONS_INITIAL, zoom);
+			//pretestMandelValues();
 			computeMandelValues();
 			break;
+
+		case 'r':
+			returnToPrevFrame();
+			//pretestMandelValues();
+			computeMandelValues();
+			break;
+
+		//dev mode?
+		case 'i':
+			MANUAL_ITER_MODE = true;
+			ip = 0;
+			enteredIters[0] = '\0';
+			break;
+
+		case ' ':
+			if (MANUAL_ITER_MODE == true)
+			{
+				ITERATIONS = strtoul(enteredIters, NULL, 10);
+				fprintf(db, "read %s, setting iters to %d\n", enteredIters, ITERATIONS);
+				MANUAL_ITER_MODE = false;
+				computeMandelValues();
+			}
+			break;
+	}
+
+	if (key>='0' && key<='9')
+	{
+		if (MANUAL_ITER_MODE == true)
+		{
+			fprintf(db, "entered key %c at location %d\n", key, ip);
+			enteredIters[ip] = key;
+			ip++;
+			enteredIters[ip] = '\0';
+		}
 	}
 	
 }
@@ -38,20 +77,6 @@ void processMouseLoc(int x, int y)
 		zoomBoxEndy = 1.0-((float)y/Y_SCREEN_GL);
 
 		//make sure the box preserves the 3:2 window ratio
-		/*xboxdist = zoomBoxEndx - zoomBoxStartx;
-		yboxdist = zoomBoxEndy - zoomBoxStarty;
-
-		if (fabs(xboxdist/3) > fabs(yboxdist/2))	//too long
-		{
-			xdir = xboxdist / fabs(xboxdist);
-			zoomBoxEndx = zoomBoxStartx + xdir*fabs(yboxdist*3/2);
-		}
-		else if (fabs(xboxdist/3) < fabs(yboxdist/2))
-		{
-			ydir = yboxdist / fabs(yboxdist);
-			zoomBoxEndy = zoomBoxStarty + ydir*fabs(xboxdist*2/3);
-		}*/
-
 		xboxdist = zoomBoxEndx - zoomBoxStartx;
 		yboxdist = zoomBoxEndy - zoomBoxStarty;
 
@@ -66,7 +91,10 @@ void processMouseLoc(int x, int y)
 			zoomBoxEndy = zoomBoxStarty + ydir*fabs(xboxdist);
 		}
 
-		nextzoom = zoom / fabs(zoomBoxEndx - zoomBoxStartx);
+		if (fabs(zoomBoxStartx-zoomBoxEndx)>minBoxSize)
+			nextzoom = zoom / fabs(zoomBoxEndx - zoomBoxStartx);
+		else
+			nextzoom = zoom;
 	}
 }
 
@@ -77,13 +105,17 @@ void processMouseClicks(int button, int state, int x, int y)
 		mouseHeld = true;
 		zoomBoxStartx = (float)x/X_SCREEN_GL;
 		zoomBoxStarty = 1.0-((float)y/Y_SCREEN_GL);
-		//zoomBoxEndx = zoomBoxStartx;
-		//zoomBoxEndy = zoomBoxStarty;
+		zoomBoxEndx = zoomBoxStartx;
+		zoomBoxEndy = zoomBoxStarty;
 	}
 	else
 	{
 		mouseHeld = false;
-		zoomIn();
+
+		//make sure user didn't just click
+		fprintf(db, "box size: %f\n", fabs(zoomBoxStartx-zoomBoxEndx));
+		if (fabs(zoomBoxStartx-zoomBoxEndx)>minBoxSize)
+			zoomIn();
 	}
 }
 
@@ -106,7 +138,7 @@ void zoomIn()
 		zoomBoxEndy = temp;
 	}
 
-	fprintf(db, "graphical box coords: %f,%f,%f,%f\n", zoomBoxStartx, zoomBoxEndx, zoomBoxStarty, zoomBoxEndy);
+	//fprintf(db, "graphical box coords: %f,%f,%f,%f\n", zoomBoxStartx, zoomBoxEndx, zoomBoxStarty, zoomBoxEndy);
 
 	//compute the numerical span of the current view
 	xspan = xmax-xmin;
@@ -118,17 +150,20 @@ void zoomIn()
 	ymax = ymin + yspan*zoomBoxEndy;
 	ymin = ymin + yspan*zoomBoxStarty;		
 
-	fprintf(db, "new numerical coords: %f,%f,%f,%f\n", xmin, xmax, ymin, ymax);
+	//fprintf(db, "new numerical coords: %f,%f,%f,%f\n", xmin, xmax, ymin, ymax);
 
 	//increase the iteration count
-	ITERATIONS /= (zoomBoxEndx - zoomBoxStartx);
-	if (ITERATIONS > 6000)
-		ITERATIONS = 6000;
+	//ITERATIONS /= (zoomBoxEndx - zoomBoxStartx);
+	//if (ITERATIONS > 10000)
+	//	ITERATIONS = 10000;
 	zoom = nextzoom;
 
-	fprintf(db, "Zooming in to (%lf, %lf, %lf, %lf)\t\titerations:\t%d\n", xmin, xmax, ymin, ymax, ITERATIONS);
+	addNewFrame(xmax, xmin, ymax, ymin, ITERATIONS, zoom);
+
+	//fprintf(db, "Zooming in to (%lf, %lf, %lf, %lf)\t\titerations:\t%d\n", xmin, xmax, ymin, ymax, ITERATIONS);
 
 	//recompute the image
+	pretestMandelValues();
 	computeMandelValues();
 }
 
@@ -152,4 +187,5 @@ void processSpecialKeys(int key, int x, int y)
 			crossx -= 0.05f;
 			break;
 	}*/
+
 }

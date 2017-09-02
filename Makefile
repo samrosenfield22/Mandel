@@ -1,5 +1,5 @@
 #OBJS specifies your file to be compiled
-OBJS = src/main.c src/mandel.c src/render.c src/keys.c
+OBJS = src/main.c src/mandel.c src/render.c src/keys.c src/history.c
 
 #CC specifies the compiler
 CC = gcc

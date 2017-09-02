@@ -10,15 +10,21 @@
 #include "../include/mandel.h"
 #include "../include/render.h"
 #include "../include/keys.h"
+#include "../include/history.h"
 
-uint32_t ITERATIONS = ITERATIONS_INITIAL;
+uint32_t ITERATIONS;
 uint16_t *mandVals;
 FILE *mdata, *db;
 
-double xmax=XMAX_INITIAL, xmin=XMIN_INITIAL, ymax=YMAX_INITIAL, ymin=YMIN_INITIAL;
+//mvalue_t xmax=XMAX_INITIAL, xmin=XMIN_INITIAL, ymax=YMAX_INITIAL, ymin=YMIN_INITIAL;
+//float zoom = 1.0f, nextzoom = 1.0f;
+mvalue_t xmax, xmin, ymax, ymin;
+float zoom, nextzoom;
 bool mouseHeld = false;
 float zoomBoxStartx, zoomBoxStarty, zoomBoxEndx, zoomBoxEndy;
-float zoom = 1.0f, nextzoom = 1.0f;
+
+framestack history;
+
 
 int main(int argc, char **argv)
 {
@@ -37,7 +43,12 @@ int main(int argc, char **argv)
   if(db == NULL) return 0;
   fprintf(db, "Files opened...\n");
 
+  //load the first window/frame
+  history.fcnt = (uint8_t)-1;
+  addNewFrame(XMAX_INITIAL, XMIN_INITIAL, YMAX_INITIAL, YMIN_INITIAL, ITERATIONS_INITIAL, 1.0f);
+
   //compute the initial data set
+  //pretestMandelValues();
   computeMandelValues();
 
   // register callbacks

@@ -2,22 +2,87 @@
 
 #include "../include/mandel.h"
 
+void pretestMandelValues()
+{
+	const uint16_t pretestCt = 10;		//test (pretest_ct^2) points on the new frame
+	uint32_t iterationHighCutoff, iterationLowCutoff;
+	const float xstep = (xmax-xmin)/pretestCt;
+	const float ystep = (ymax-ymin)/pretestCt;
+	//const uint16_t maxAcceptableHighEscapes = 0.1 * (float)(pretestCt*pretestCt);
 
+	//uint16_t highEscapeCt = 0;
+	mvalue_t x,y;
+	uint32_t val;
+	//uint32_t highestEscape;
+	uint32_t highestEscapes[3] = {0, 0, 0};
+	uint32_t highestEscapeAvg;
+	uint8_t i;
+
+	bool highEscapesDetected = true;
+	
+	//
+	while(highEscapesDetected == true)
+	{
+		//initialize values
+		//highestEscape = 0;
+		memset(highestEscapes, 0, 3);
+		iterationHighCutoff = ITERATIONS/2;
+		iterationLowCutoff = ITERATIONS/5;
+
+		//test points
+		for(y=ymax; y>ymin; y-=ystep)
+			for(x=xmin; x<xmax; x+=xstep)
+			{
+				val = testPoint(x,y);
+
+				//if (val>highestEscape && val!=ITERATIONS) highestEscape = val;
+				if (val!=ITERATIONS)
+				{
+					for(i=0; i<3; ++i)
+					{
+						if (val > highestEscapes[i])
+							highestEscapes[i] = val;
+					}
+				}
+			}
+
+		//
+		//fprintf(db, "\n-----------PRETEST-----------\nchecking all points w iteration greater than %d (max. iter = %d)\n", iterationHighCutoff, ITERATIONS);
+		
+		highestEscapeAvg = (highestEscapes[0] + highestEscapes[1] + highestEscapes[2])/3;
+		if (highestEscapeAvg > iterationHighCutoff)
+		{
+			//too high!
+			fprintf(db, "iters too high, dropping from %d to %d\n", ITERATIONS, 2*highestEscapeAvg);
+			ITERATIONS = 2*highestEscapeAvg;
+		}
+		else if (highestEscapeAvg < iterationLowCutoff)
+		{
+			fprintf(db, "iters too low, dropping from %d to %d\n", ITERATIONS, 3*highestEscapeAvg);
+			//ITERATIONS = 3*highestEscape;
+			ITERATIONS /= 2;
+			break;
+		}
+		else break;
+
+		//fprintf(db, "%d out of %d tested points escaped with high values!\n", highEscapeCt, pretestCt*pretestCt);
+		//tooManyHighEscapes = (highEscapeCt > maxAcceptableHighEscapes)? true:false;
+		//return tooManyHighEscapes;
+	}
+
+}
 
 void computeMandelValues()
 {
-	long double x,y;
-	//float xdim, ydim;
-	uint32_t uncompMandSize, actualMandSize=0;
+	mvalue_t x,y;
 
 	uint32_t highestEscapeIter = 0;
 
-	long double xresolution = (xmax-xmin) / INCR;
-	long double yresolution = (ymax-ymin) / (INCR*0.667);
+	mvalue_t xresolution = (xmax-xmin) / INCR;
+	mvalue_t yresolution = (ymax-ymin) / (INCR*0.667);
 
 	//compression-related vars
 	uint32_t val, nextVal, repeatCount=1;
-	uint32_t slowEscapers = 0;
 
 	uint32_t page[PAGE_SIZE];
 	uint16_t pindex = 0;
@@ -44,7 +109,6 @@ void computeMandelValues()
 		{
 			nextVal = testPoint(x,y);
 			fprintf(hist, "%d, ", nextVal);
-			//if (nextVal > 500 && nextVal != ITERATIONS) slowEscapers++;
 
 			if (val == nextVal)
 			{
@@ -115,18 +179,10 @@ void computeMandelValues()
 	addWordToPage(page, &pindex, CMP_END_OF_FILE);
 	writePageToFile(page, mdata);
 
-	//actualMandSize++;\
-
 	fprintf(db, "highest escaped iteration value was %d\n\n", highestEscapeIter);
-	
-	//fprintf(db, "Uncompressed number of inter values:\t%d\n", uncompMandSize);
-	//fprintf(db, "Actual number of inter values:\t%d\n", actualMandSize);
-	//fprintf(db, "slow escapers: %d out of %d\n", slowEscapers, INCR*INCR*2/3);
-
 	fclose(mdata);
 	fclose(hist);
 
-	//return mandVals;
 }
 
 void addWordToPage(uint32_t page[PAGE_SIZE], uint16_t *i, uint32_t word)
@@ -146,10 +202,10 @@ void writePageToFile(uint32_t page[PAGE_SIZE], FILE *fp)
 	fwrite(page, 4, PAGE_SIZE, fp);
 }
 
-inline uint32_t testPoint(long double cx, long double cy)
+inline uint32_t testPoint(mvalue_t cx, mvalue_t cy)
 {
 	uint32_t i;
-	long double x, y, xsqr, ysqr, nextx, nexty;
+	mvalue_t x, y, xsqr, ysqr, nextx, nexty;
 
 	//initialize the sequence
 	x = cx;

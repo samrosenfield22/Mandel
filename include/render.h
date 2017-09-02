@@ -12,15 +12,21 @@
 #define X_SCREEN_GL 960
 #define Y_SCREEN_GL 640
 
-#define X_SCREENLEN 12.4
-#define Y_SCREENLEN 8.2
-//#define ZOOM_DEPTH 1.2
+#define X_SCREENLEN ((float)X_SCREEN_GL/78)
+#define Y_SCREENLEN ((float)Y_SCREEN_GL/78)
+
+#define COLOR0 	{1.0f, 0.0f, 0.0f}			//red
+#define COLOR1	{0.29f, 0.0f, 0.51f}		//indigo
+#define COLOR2	{0.0f, 0.5f, 1.0f}			//cyan-ish
+#define COLOR3	{0.0f, 1.0f, 0.0f}			//green
+#define COLOR4	{1.0f, 1.0f, 0.0f}			//yellow
 
 //
 //extern float crossx, crossy;
 extern bool mouseHeld;
 extern float zoomBoxStartx, zoomBoxStarty, zoomBoxEndx, zoomBoxEndy;
 extern float zoom, nextzoom;
+
 
 //
 void renderScene(void);
