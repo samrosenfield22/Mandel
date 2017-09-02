@@ -1,6 +1,6 @@
 # Mandel
 
-Mandel is an interactive viewer for the Mandelbrot set. You can zoom into any area of the set by simply clicking and dragging the mouse to highlight the desired area. At any time, the user can press 'r' to return to the full image.
+Mandel is an interactive viewer for the Mandelbrot set. You can zoom into any area of the set by simply clicking and dragging the mouse to highlight the desired area. At any time, the user can press 'r' to return to the previously loaded image, or 'h' to load the full image.
 
 ![A zoom into an area of the Mandelbrot set, showing escape values](doc/mandelzoom.PNG)
 
