@@ -5,30 +5,30 @@
 
 void renderScene()
 {
-  static float angle = 0.0f;
-  char zoomstr[30];		//8 text chars (including the null), + up to 22 digits (including the decimal point + tenth)
-  char iterstr[13];
+	static float angle = 0.0f;
+	char zoomstr[30];		//8 text chars (including the null), + up to 22 digits (including the decimal point + tenth)
+	char iterstr[13];
 
-  //do some openGL magic
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear Color and Depth Buffers
-  glLoadIdentity();                   // Reset transformations
-  gluLookAt(  0.0f, 0.0f, 10.0f,            // Set the camera
-      0.0f, 0.0f,  0.0f,
-      0.0f, 1.0f,  0.0f);
-  glRotatef(angle, 0.0f, 1.0f, 0.0f);         //set camera rotation
+	//do some openGL magic
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear Color and Depth Buffers
+	glLoadIdentity();                   // Reset transformations
+	gluLookAt(  0.0f, 0.0f, 10.0f,            // Set the camera
+	0.0f, 0.0f,  0.0f,
+	0.0f, 1.0f,  0.0f);
+	glRotatef(angle, 0.0f, 1.0f, 0.0f);         //set camera rotation
 
-  
-  //render the current display
-  renderMandel();
+	  
+	//render the current display
+	renderMandel();
 
-  sprintf(zoomstr, "Zoom: %.1fx", nextzoom);
-  renderText(-5.8, -3.85, zoomstr, 0.0, 0.6, 0.0, GLUT_BITMAP_9_BY_15);
-  sprintf(iterstr, "Iters: %d", ITERATIONS);
-  renderText(4.6, -3.85, iterstr, 0.0, 0.6, 0.0, GLUT_BITMAP_9_BY_15);
-  if (mouseHeld) renderZoomBox();
+	sprintf(zoomstr, "Zoom: %.1fx", nextzoom);
+	renderText(-5.8, -3.85, zoomstr, 0.0, 0.6, 0.0, GLUT_BITMAP_9_BY_15);
+	sprintf(iterstr, "Iters: %d", ITERATIONS);
+	renderText(4.6, -3.85, iterstr, 0.0, 0.6, 0.0, GLUT_BITMAP_9_BY_15);
+	if (mouseHeld) renderZoomBox();
 
-  //update display buffer
-  glutSwapBuffers();
+	//update display buffer
+	glutSwapBuffers();
 }
 
 void changeSize(int w, int h)
@@ -205,7 +205,6 @@ void drawPixel(float xpix, float ypix, float xinc, float yinc, uint32_t iters)
 		pixboxStarty = (zoomBoxStarty-0.5) * Y_SCREENLEN;
 		pixboxEndy = (zoomBoxEndy-0.5) * Y_SCREENLEN;
 		fprintf(db, "dimming all points out of %f,%f,%f,%f\n", pixboxStartx, pixboxEndx, pixboxStarty, pixboxEndy);
-
 		if (	((xpix>pixboxStartx && xpix>pixboxEndx) || (xpix<pixboxStartx && xpix<pixboxEndx))
 			&& ((ypix>pixboxStarty && ypix>pixboxEndy) || (ypix<pixboxStarty && ypix<pixboxEndy))	)
 		{
@@ -285,4 +284,3 @@ void renderText(float x, float y, char *c, float r, float g, float b, void *font
 
 	glPopMatrix();
 }
-

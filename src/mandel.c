@@ -87,7 +87,12 @@ void computeMandelValues()
 	uint32_t page[PAGE_SIZE];
 	uint16_t pindex = 0;
 
+	const uint8_t histBins = 50;
+	uint32_t histogram[histBins];
+	uint32_t histBinSize = ITERATIONS/histBins;
+	uint32_t histCount;
 
+	memset(histogram, 0, histBins);
 
 	mdata = fopen("../dat/mdata.txt", "wb");
 	fseek(mdata, 0, SEEK_SET);
@@ -103,12 +108,19 @@ void computeMandelValues()
 	for(y=ymax; y>ymin; y-=yresolution)
 	{
 		val = testPoint(xmin, y);
-		fprintf(hist, "%d, ", val);
 
 		for(x=xmin+xresolution; x<xmax; x+=xresolution)
 		{
 			nextVal = testPoint(x,y);
-			fprintf(hist, "%d, ", nextVal);
+			//fprintf(hist, "%d, ", nextVal);
+			for(histCount=0; histCount<histBins; ++histCount)
+			{
+				if (nextVal < (histCount*histBinSize))
+				{
+					histogram[histCount]++;
+					break;
+				}
+			}
 
 			if (val == nextVal)
 			{
@@ -180,6 +192,12 @@ void computeMandelValues()
 	writePageToFile(page, mdata);
 
 	fprintf(db, "highest escaped iteration value was %d\n\n", highestEscapeIter);
+	
+	for(histCount=0; histCount<histBins; ++histCount)
+	{
+		fprintf(hist, "%d, %d\n", histCount, histogram[histCount]);
+	}
+
 	fclose(mdata);
 	fclose(hist);
 
