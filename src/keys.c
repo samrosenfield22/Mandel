@@ -2,12 +2,18 @@
 
 #include "../include/keys.h"
 
-
+/*
+Function: void processNormalKeys(unsigned char, int, int)
+Arguments:	unsigned char key (ASCII value of the key being pressed)
+			int x, y (not used)
+Returns: none
+Description: processes key presses. For more details on specific keys, consult the readme.
+*/
 void processNormalKeys(unsigned char key, int x, int y)
 {
-	static char enteredIters[7];
+	//static char enteredIters[7];
 	static uint8_t ip=0;
-	static bool MANUAL_ITER_MODE = false;
+	//static bool MANUAL_ITER_MODE = false;
 
 	switch(key)
 	{
@@ -65,6 +71,43 @@ void processNormalKeys(unsigned char key, int x, int y)
 	
 }
 
+/*
+Function: void processMouseClicks(int, int, int, int)
+Arguments: 	int button (not used)
+			int state (state of the mouse button)
+			int x, y (coordinates of the mouse click)
+Returns: none
+Description: checks if the mouse button is being pressed or released. If it's pressed, start drawing a zoom box;
+if it's released, zoom into the current zoom box
+*/
+void processMouseClicks(int button, int state, int x, int y)
+{
+	if (state == GLUT_DOWN)
+	{
+		mouseHeld = true;
+		zoomBoxStartx = (float)x/X_SCREEN_GL;
+		zoomBoxStarty = 1.0-((float)y/Y_SCREEN_GL);
+		zoomBoxEndx = zoomBoxStartx;
+		zoomBoxEndy = zoomBoxStarty;
+	}
+	else
+	{
+		mouseHeld = false;
+
+		//make sure user didn't just click
+		fprintf(db, "box size: %f\n", fabs(zoomBoxStartx-zoomBoxEndx));
+		if (fabs(zoomBoxStartx-zoomBoxEndx)>minBoxSize)
+			zoomIn();
+	}
+}
+
+/*
+Function: void processMouseLoc(int, int)
+Arguments: 	int x, y (coordinates of the mouse's location)
+Returns: none
+Description: whenever the mouse is moved (not clicked), this function checks if the mouse is held, and
+if it is, updates the zoom box coordinates
+*/
 void processMouseLoc(int x, int y)
 {
 	float xboxdist, yboxdist;
@@ -98,33 +141,19 @@ void processMouseLoc(int x, int y)
 	}
 }
 
-void processMouseClicks(int button, int state, int x, int y)
-{
-	if (state == GLUT_DOWN)
-	{
-		mouseHeld = true;
-		zoomBoxStartx = (float)x/X_SCREEN_GL;
-		zoomBoxStarty = 1.0-((float)y/Y_SCREEN_GL);
-		zoomBoxEndx = zoomBoxStartx;
-		zoomBoxEndy = zoomBoxStarty;
-	}
-	else
-	{
-		mouseHeld = false;
-
-		//make sure user didn't just click
-		fprintf(db, "box size: %f\n", fabs(zoomBoxStartx-zoomBoxEndx));
-		if (fabs(zoomBoxStartx-zoomBoxEndx)>minBoxSize)
-			zoomIn();
-	}
-}
-
+/*
+Function: void zoomIn(void)
+Arguments: none
+Returns: none
+Description: zooms in to the area selected by the zoom box. This function maps the graphical box coordinates to the
+appropriate mathematical values.
+*/
 void zoomIn()
 {
 	float xspan, yspan;
 	float temp;
 
-	//set box orientation
+	//set box orientation if it's inverted
 	if (zoomBoxStartx > zoomBoxEndx)
 	{
 		temp = zoomBoxStartx;
@@ -165,27 +194,4 @@ void zoomIn()
 	//recompute the image
 	pretestMandelValues();
 	computeMandelValues();
-}
-
-void processSpecialKeys(int key, int x, int y)
-{
-	/*switch(key)
-	{
-		case GLUT_KEY_UP:
-			crossy += 0.05f;
-			break;
-
-		case GLUT_KEY_DOWN:
-			crossy -= 0.05f;
-			break;
-
-		case GLUT_KEY_RIGHT:
-			crossx += 0.05f;
-			break;
-
-		case GLUT_KEY_LEFT:
-			crossx -= 0.05f;
-			break;
-	}*/
-
 }

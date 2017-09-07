@@ -8,6 +8,7 @@
 #include <stdbool.h>
 
 #include "mandel.h"
+#include "keys.h"
 
 #define X_SCREEN_GL 960
 #define Y_SCREEN_GL 640

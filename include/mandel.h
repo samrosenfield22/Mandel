@@ -11,7 +11,8 @@
 #include <stdbool.h>
 #include <math.h>
 
-typedef long double mvalue_t;
+//typedef long double mvalue_t;
+typedef double mvalue_t;
 /*#include <quadmath.h>
 #ifdef __float128
 	typedef __float128 mvalue_t;

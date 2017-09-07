@@ -2,6 +2,14 @@
 
 #include "../include/history.h"
 
+/*
+Function: void addNewFrame(mvalue_t, mvalue_t, mvalue_t, mvalue_t, uint32_t, float)
+Arguments:	mvalue_t xmaxp, xminp, ymaxp, yminp (corners of the new frame)
+			uint32_t itersp (maximum iterations for the new frame)
+			float zoomp ()
+Returns: none
+Description: adds a new frame (description of a zoom state) to the stack, which allows us to return to previous images
+*/
 void addNewFrame(mvalue_t xmaxp, mvalue_t xminp, mvalue_t ymaxp, mvalue_t yminp, uint32_t itersp, float zoomp)
 {
 	history.fcnt++;
@@ -15,6 +23,12 @@ void addNewFrame(mvalue_t xmaxp, mvalue_t xminp, mvalue_t ymaxp, mvalue_t yminp,
 	loadCurFrame();
 }
 
+/*
+Function: void returnToPrevFrame(void)
+Arguments: none
+Returns: none
+Description: reloads the last image
+*/
 void returnToPrevFrame()
 {
 	if (history.fcnt)
@@ -23,6 +37,12 @@ void returnToPrevFrame()
 	loadCurFrame();
 }
 
+/*
+Function: 
+Arguments: 
+Returns: 
+Description: after adding or returning from another frame, this function loads the parameters of the current frame so that it can be displayed
+*/
 void loadCurFrame()
 {
 	uint8_t i = history.fcnt;
@@ -38,6 +58,9 @@ void loadCurFrame()
 	dumpHistory();
 }
 
+/*
+Description: for debug
+*/
 void dumpHistory()
 {
 	uint8_t i;

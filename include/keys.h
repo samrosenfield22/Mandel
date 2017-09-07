@@ -11,8 +11,11 @@
 
 #define minBoxSize 0.003f
 
+extern char enteredIters[7];
+extern bool MANUAL_ITER_MODE;
+
 void processNormalKeys(unsigned char, int, int);
-void processSpecialKeys(int, int, int);
+//void processSpecialKeys(int, int, int);
 void processMouseClicks(int, int, int, int);
 void processMouseLoc(int, int);
 

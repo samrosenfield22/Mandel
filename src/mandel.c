@@ -2,6 +2,13 @@
 
 #include "../include/mandel.h"
 
+/*
+Function: void pretestMandelValues(void)
+Arguments: none
+Returns: none
+Description: computes iteration values for a small sample of points, and adjusts the maximum
+iteration count accordingly
+*/
 void pretestMandelValues()
 {
 	const uint16_t pretestCt = 10;		//test (pretest_ct^2) points on the new frame
@@ -52,13 +59,15 @@ void pretestMandelValues()
 		highestEscapeAvg = (highestEscapes[0] + highestEscapes[1] + highestEscapes[2])/3;
 		if (highestEscapeAvg > iterationHighCutoff)
 		{
-			//too high!
-			fprintf(db, "iters too high, dropping from %d to %d\n", ITERATIONS, 2*highestEscapeAvg);
+			//too low!
+			fprintf(db, "iters too low, raising from %d to %d\n", ITERATIONS, 2*highestEscapeAvg);
 			ITERATIONS = 2*highestEscapeAvg;
 		}
-		else if (highestEscapeAvg < iterationLowCutoff)
+		//else if (highestEscapeAvg < iterationLowCutoff)
+		else if (highestEscapes[0] < iterationLowCutoff)
 		{
-			fprintf(db, "iters too low, dropping from %d to %d\n", ITERATIONS, 3*highestEscapeAvg);
+			//too high!
+			fprintf(db, "iters too high, dropping from %d to %d\n", ITERATIONS, 3*highestEscapeAvg);
 			//ITERATIONS = 3*highestEscape;
 			ITERATIONS /= 2;
 			break;
@@ -72,6 +81,13 @@ void pretestMandelValues()
 
 }
 
+/*
+Function: void computeMandelValues(void)
+Arguments: none
+Returns: none
+Description: Computes the iteration value for every point in the current zoom, and stores them in
+the data file
+*/
 void computeMandelValues()
 {
 	mvalue_t x,y;
@@ -203,6 +219,15 @@ void computeMandelValues()
 
 }
 
+/*
+Function: void addWordToPage(uint32_t[PAGE_SIZE], uint16_t *, uint32_t)
+Arguments: 	uint32_t page[PAGE_SIZE] (current block of data to be written to the file)
+			uint16_t *i (pointer to an index, which stores the current element in the page)
+			uint32_t word (a word, representing an iteration value or a control sequence, to be added to the page)
+Returns: void
+Description: adds a word to the page, and increments the index. If the end of the page is reached, the page is
+written to the file, and the index is reset
+*/
 void addWordToPage(uint32_t page[PAGE_SIZE], uint16_t *i, uint32_t word)
 {
 	page[*i] = word;
@@ -215,15 +240,31 @@ void addWordToPage(uint32_t page[PAGE_SIZE], uint16_t *i, uint32_t word)
 	}
 }
 
+/*
+Function: void writePageToFile(uint32_t[PAGE_SIZE], FILE *)
+Arguments: 	uint32_t page[PAGE_SIZE] (block of data being written to the file)
+			FILE *fp (pointer to the file)
+Returns: none
+Description: writes the page in 32-bit chunks to fp
+*/
 void writePageToFile(uint32_t page[PAGE_SIZE], FILE *fp)
 {
 	fwrite(page, 4, PAGE_SIZE, fp);
 }
 
+/*
+Function: inline uint32_t testPoint(mvalue_t, mvalue_t)
+Arguments: mvalue_t cx, mvalue_t cy (real and imaginary parts of a complex value)
+Returns: uint32_t (the iteration value of the point)
+Description: computes whether or not a given point is in the Mandelbrot set, and if not, how many iterations
+it takes to escape. An iterative calculation is performed on the point, until either the iteratively computed
+value escapes, or the maximum interation value is reached. For more details on the mathematics, see the math
+document
+*/
 inline uint32_t testPoint(mvalue_t cx, mvalue_t cy)
 {
 	uint32_t i;
-	mvalue_t x, y, xsqr, ysqr, nextx, nexty;
+	mvalue_t x, y, xsqr, ysqr;
 
 	//initialize the sequence
 	x = cx;
@@ -241,6 +282,7 @@ inline uint32_t testPoint(mvalue_t cx, mvalue_t cy)
 		if (xsqr + ysqr >= 4)
 			break;
 
+		/*
 		//compute Z[n]^2
 		//(a+bj)(a+bj) = a^2-b^2 + 2abj
 		//new a: a^2-b^2		new b: 2ab
@@ -249,7 +291,25 @@ inline uint32_t testPoint(mvalue_t cx, mvalue_t cy)
 
 		//update the sequence
 		x = nextx;
-		y = nexty;
+		y = nexty;*/
+
+		y = 2*x*y + cy;
+		x = xsqr - ysqr + cx;
+
+		/*
+		SIMD using FMA instructions:
+		sqr		xsqr,x
+		sqr		ysqr,y
+		add 	cMag,xsqr
+		add 	cMag,ysqr
+		//compare
+		mul 	y,x
+		fma 	y,2,cy
+		mov		x,xsqr
+		sub 	x,ysqr
+		add 	x,cx
+
+		*/
 		
 	}
 
