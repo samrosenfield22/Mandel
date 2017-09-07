@@ -187,11 +187,11 @@ void zoomIn()
 	//	ITERATIONS = 10000;
 	zoom = nextzoom;
 
-	addNewFrame(xmax, xmin, ymax, ymin, ITERATIONS, zoom);
 
 	//fprintf(db, "Zooming in to (%lf, %lf, %lf, %lf)\t\titerations:\t%d\n", xmin, xmax, ymin, ymax, ITERATIONS);
 
 	//recompute the image
 	pretestMandelValues();
+	addNewFrame(xmax, xmin, ymax, ymin, ITERATIONS, zoom);
 	computeMandelValues();
 }

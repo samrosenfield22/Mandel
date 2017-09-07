@@ -20,6 +20,8 @@ void addNewFrame(mvalue_t xmaxp, mvalue_t xminp, mvalue_t ymaxp, mvalue_t yminp,
 	history.frame[history.fcnt].iters = itersp;
 	history.frame[history.fcnt].zoom = zoomp;
 
+	
+
 	loadCurFrame();
 }
 

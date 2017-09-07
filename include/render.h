@@ -21,9 +21,9 @@
 #define COLOR2	{0.0f, 0.5f, 1.0f}			//cyan-ish
 #define COLOR3	{0.0f, 1.0f, 0.0f}			//green
 #define COLOR4	{1.0f, 1.0f, 0.0f}			//yellow
+#define COLOR5	{1.0f, 0.64f, 0.0f}			//orange
 
-//
-//extern float crossx, crossy;
+//external global variables
 extern bool mouseHeld;
 extern float zoomBoxStartx, zoomBoxStarty, zoomBoxEndx, zoomBoxEndy;
 extern float zoom, nextzoom;

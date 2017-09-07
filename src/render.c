@@ -105,9 +105,10 @@ void renderMandel()
 
 	readPageFromFile(page, mdata);
 
-	while(iters != CMP_END_OF_FILE)
+	while(1)
 	{
 		iters = readWordFromPage(page, &piter);
+		if (iters == CMP_END_OF_FILE) break;
 
 		switch(iters)
 		{
@@ -197,14 +198,12 @@ void drawPixel(float xpix, float ypix, float xinc, float yinc, uint32_t iters)
 	//uint32_t cutoff = 30;
 	//uint32_t lastCutoff;
 	//uint8_t colSeg=1, lastColSeg=0;
-	
-	//const uint32_t cutoffs[] = {0, 30, 200, 800, 2000, 6000};
-	const uint32_t cutoffs[] = {0, 30, 200, 800, 2000, 5000, 15000, 50000, 120000, 400000, 800000};
+	const uint32_t cutoffs[] = {0, 30, 200, 800, 2000, 10000, 30000, 100000, 300000, 900000, 1500000};
 	const float colorsegs[][3] = 
 	{
 		{0.0f, 0.0f, 0.0f},
-		COLOR0,	COLOR1, COLOR2, COLOR3, COLOR4,
-		COLOR0,	COLOR1, COLOR2, COLOR3, COLOR4
+		COLOR0,	COLOR1, COLOR2, COLOR3, COLOR4, COLOR5,
+		COLOR0,	COLOR1, COLOR2, COLOR3, COLOR4, COLOR5
 	};
 	bool colorWithinRange = false;
 	uint8_t i, j;
@@ -215,6 +214,10 @@ void drawPixel(float xpix, float ypix, float xinc, float yinc, uint32_t iters)
 		r = 0.0;
 		g = 0.0;
 		b = 1.0;
+	}
+	else if (iters == (uint32_t)-1)
+	{
+		fprintf(db, "Warning: drawPixel() received a pixel value of -1\n");
 	}
 	else
 	{
@@ -261,7 +264,7 @@ void drawPixel(float xpix, float ypix, float xinc, float yinc, uint32_t iters)
 			r = colorsegs[5][0] * compcolor;
 			g = colorsegs[5][1] * compcolor;
 			b = colorsegs[5][2] * compcolor;
-			fprintf(db, "iters=%d, setting color division factor to %f\n", iters, compcolor);
+			//fprintf(db, "iters=%d, setting color division factor to %f\n", iters, compcolor);
 		}
 	}
 

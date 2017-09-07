@@ -128,6 +128,9 @@ void computeMandelValues()
 		for(x=xmin+xresolution; x<xmax; x+=xresolution)
 		{
 			nextVal = testPoint(x,y);
+			if (nextVal == CMP_START_REPEAT_SET)
+				fprintf(db, "Found a point with value 0x%0x\n", nextVal);
+
 			//fprintf(hist, "%d, ", nextVal);
 			for(histCount=0; histCount<histBins; ++histCount)
 			{
